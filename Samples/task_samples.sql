@@ -1,25 +1,74 @@
---Zadania Pomiary
---Tabela samples zawiera dane pomiarów dla pewnej liczby próbek. Ka¿da próbka by³a poddawana trzem testom. Poza wynikami testów ka¿dy rekord zawiera równie¿ wielkoœci dwóch wspó³czynników. 
+---------------
+--Samples tasks
+---------------
+/*
+The samples table contains measurement data for a certain number of samples.
+Each sample was subjected to three tests.
+In addition to the test results, each record also contains the values of the two factors.
+*/
 
 
---1. Oblicz sumê wyników trzech testów dla ka¿dej próbki i wyœwietl kolumny: id oraz obliczon¹ sumê. Drug¹ kolumnê nazwij total i posortuj po niej rekordy malej¹co.
+/*
+Calculate the sum of the results of the three tests for each sample and display the columns: id and the calculated sum.
+The second column call total and sort the records in descending order.
+*/
 
-SELECT id, test_1+test_2+test_3 AS total FROM samples ORDER BY total DESC;
-
-
-
---2. Dla próbek o parzystych id, oblicz œredni¹ wyników testów pomno¿on¹ przez wartoœæ factor (kolumnê nazwij average). Uszereguj rekordy malej¹co po tej kolumnie. 
-
-SELECT id, ((test_1+test_2+test_3)/3)*factor AS average FROM samples WHERE id%2 = 0 GROUP BY id ORDER BY average DESC;
-
-
-
---3. Pole group zawiera oznaczenie do jakiej grupy: A, B, czy C nale¿y próbka. Oblicz liczbê próbek nale¿¹cych do poszczególnych grup. Uwzglêdnij jedynie próbki, w których suma wyników testów jest wiêksza ni¿ 10. Uwzglêdnij jedynie grupy, dla których liczba próbek spe³niaj¹cych ten warunek jest wiêksza ni¿ 1. Uszereguj rekordy malej¹co po liczbie próbek. Kolumnê z liczb¹ próbek nazwij total samples. Wyœwietl kolumny z nazw¹ grupy (group) oraz z liczb¹ próbek. 
-
-SELECT [group], COUNT(id) AS [total samples] FROM samples WHERE test_1+test_2+test_3 > 10 GROUP BY [group] HAVING COUNT(id) > 1 ORDER BY [total samples] DESC;
+SELECT 
+	id, 
+	test_1+test_2+test_3 AS total 
+FROM samples 
+ORDER BY total DESC;
 
 
 
---4. Funkcja round( x, y ) zaokr¹gla liczbê x do wartoœci z y miejscami po przecinku.  W tabeli samples po zaokr¹gleniu  sumy z pól test_1, test_2 i test_3 do wartoœci ca³kowitych, suma ta mo¿e powtarzaæ siê w wielu rekordach. Usuñ z tabeli samples rekordy, w których wspomniana suma jest taka sama dla wiêcej ni¿ dwóch rekordów. 
+/*
+For samples with even id numbers, calculate the mean of the test results multiplied by the value factor (name the column average)
+Order records in descending order after this column.
+*/
 
-DELETE FROM samples WHERE ROUND((test_1+test_2+test_3),0)  IN  (SELECT ROUND((test_1+test_2+test_3),0) FROM samples GROUP BY ROUND((test_1+test_2+test_3),0) HAVING COUNT(*) >2);
+SELECT 
+	id, 
+	((test_1+test_2+test_3)/3)*factor AS average 
+FROM samples 
+WHERE id%2 = 0 
+GROUP BY id 
+ORDER BY average DESC;
+
+
+
+/*
+The group field contains the indication to which group: A, B or C the sample belongs.
+Calculate the number of samples belonging to each group. 
+Include only samples where the sum of the test results is greater than 10. 
+Include only groups for which the number of samples meeting this condition is greater than 1. 
+Order records in descending order by the number of samples. Name the column with the number of samples call total samples.
+Display columns with group name and number of samples. 
+*/
+
+SELECT 
+	[group], 
+	COUNT(id) AS [total samples] 
+FROM samples 
+WHERE test_1+test_2+test_3 > 10 
+GROUP BY [group] 
+HAVING COUNT(id) > 1 
+ORDER BY [total samples] DESC;
+
+
+
+/* 
+The round(x, y) function rounds the number x to the value with y decimal places.
+In the samples table, after the sums of test_1, test_2, and test_3 are rounded to integers, the sum may repeat across multiple records.
+Remove records from the samples table where the sum mentioned is the same for more than two records.
+*/
+
+DELETE FROM samples 
+WHERE ROUND((test_1+test_2+test_3),0)  IN  (
+		SELECT 
+			ROUND((test_1+test_2+test_3),0) 
+		FROM samples 
+		GROUP BY ROUND((test_1+test_2+test_3),0) 
+		HAVING COUNT(*) >2
+	);
+
+	
